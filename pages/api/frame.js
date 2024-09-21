@@ -48,4 +48,19 @@ export default async function handler(req, res) {
       });
     } else {
       const shareText = encodeURIComponent(`I guessed ${totalAnswered} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`);
-      const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(process.env
+      const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(process.env.NEXT_PUBLIC_BASE_URL)}`;
+
+      res.status(200).json({
+        frame: {
+          version: 'vNext',
+          image: `${process.env.NEXT_PUBLIC_BASE_URL}/api/og?message=Game Over! You guessed ${totalAnswered} quotes correctly. The correct author was ${correctAuthor}.`,
+          buttons: [
+            { label: 'Play Again' },
+            { label: 'Share', action: 'post_redirect', target: shareLink }
+          ],
+          post_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/frame`,
+        },
+      });
+    }
+  }
+}
