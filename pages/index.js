@@ -9,7 +9,7 @@ export default function Home() {
   const [gameOver, setGameOver] = useState(false);
 
   // Define shareLink globally for consistent access
-  const shareText = encodeURIComponent(`I guessed ${totalAnswered} quotes correctly! Play the Quote Game here: `);
+  const shareText = encodeURIComponent(`I guessed ${totalAnswered} quotes correctly!\n\nFrame by @aaronv.eth `);
   const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(process.env.NEXT_PUBLIC_BASE_URL)}`;
 
   useEffect(() => {
@@ -45,6 +45,7 @@ export default function Home() {
       <div>
         <Head>
           <meta property="fc:frame" content="vNext" />
+          <meta property="fc:frame:image" content={`${process.env.NEXT_PUBLIC_BASE_URL}/guessQuote.png`} />
           <meta property="fc:frame:button:1" content="Play Again" />
           <meta property="fc:frame:button:1:action" content="reload" />
           <meta property="fc:frame:button:2" content="Share" />
@@ -64,8 +65,9 @@ export default function Home() {
       <Head>
         <title>Quote Game - Guess the Author</title>
         <meta property="og:title" content="Quote Game - Guess the Author" />
-        <meta property="og:image" content="/guessQuote.png" />
+        <meta property="og:image" content={`${process.env.NEXT_PUBLIC_BASE_URL}/guessQuote.png`} />
         <meta property="fc:frame" content="vNext" />
+        <meta property="fc:frame:image" content={`${process.env.NEXT_PUBLIC_BASE_URL}/guessQuote.png`} />
         <meta property="fc:frame:button:1" content="Play the Game" />
         <meta property="fc:frame:button:1:action" content="reload" />
         <meta property="fc:frame:button:2" content="Share" />
