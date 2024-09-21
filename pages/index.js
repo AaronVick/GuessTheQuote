@@ -48,6 +48,9 @@ export default function Home() {
         fetchQuote();
       } else {
         setGameOver(true);
+        // Fetch game over state from gameOver.js
+        const gameOverResponse = await fetch('/api/gameOver', { method: 'GET' });
+        console.log(await gameOverResponse.json());
       }
       console.log('Answer processed successfully'); // Log success
     } catch (error) {
