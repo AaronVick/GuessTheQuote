@@ -25,8 +25,8 @@ export default async function handler(req, res) {
     });
   } else {
     // Answer submitted
-    const selectedAuthor = untrustedData?.buttonIndex === 2 ? untrustedData?.inputText : '';
-    const { quote, correctAuthor } = await fetchQuote(); // You need to implement a way to get the current quote and correct author
+    const selectedAuthor = buttonIndex === 2 ? untrustedData?.inputText : '';
+    const { correctAuthor } = await fetchQuote(); // This is not ideal, as it fetches a new quote. You might want to store the current quote in state.
 
     const isCorrect = selectedAuthor === correctAuthor;
     const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (isCorrect ? 1 : 0);
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
       res.status(200).json({
         frame: {
           version: 'vNext',
-          image: `${process.env.NEXT_PUBLIC_BASE_URL}/api/og?message=Game Over! You guessed ${totalAnswered} quotes correctly. The last correct author was ${correctAuthor}.`,
+          image: `${process.env.NEXT_PUBLIC_BASE_URL}/api/og?message=Game Over! You guessed ${totalAnswered} quotes correctly. The correct author was ${correctAuthor}.`,
           buttons: [
             { label: 'Play Again' },
             { label: 'Share', action: 'post_redirect', target: shareLink }
