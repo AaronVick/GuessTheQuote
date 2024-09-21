@@ -17,29 +17,43 @@ export default function Home() {
   }, []);
 
   const fetchQuote = async () => {
-    const response = await fetch('/api/quoteFrame');
-    const data = await response.json();
-    setQuote(data.quote);
-    setCorrectAuthor(data.correctAuthor);
-    setWrongAuthor(data.wrongAuthor);
-    setGameOver(false);
-  };
-
-  const handleAnswer = async (selectedAuthor) => {
-    const response = await fetch('/api/answer', {
-      method: 'POST',
-      body: JSON.stringify({ selectedAuthor, correctAuthor }),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-
-    if (data.result === 'Correct!') {
-      setTotalAnswered(totalAnswered + 1);
-      fetchQuote();
-    } else {
-      setGameOver(true);
+    console.log('Fetching quote...'); // Log when fetching starts
+    try {
+      const response = await fetch('/api/quoteFrame', {
+        method: 'GET', // Ensure GET method is used for fetching quotes
+      });
+      const data = await response.json();
+      setQuote(data.quote);
+      setCorrectAuthor(data.correctAuthor);
+      setWrongAuthor(data.wrongAuthor);
+      setGameOver(false);
+      console.log('Quote fetched successfully'); // Log success
+    } catch (error) {
+      console.error('Error fetching quote:', error); // Log any fetch errors
     }
   };
+  
+  const handleAnswer = async (selectedAuthor) => {
+    console.log('Sending answer...'); // Log when sending answer
+    try {
+      const response = await fetch('/api/answer', {
+        method: 'POST', // Ensure POST method is used for submitting answers
+        body: JSON.stringify({ selectedAuthor, correctAuthor }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await response.json();
+  
+      if (data.result === 'Correct!') {
+        setTotalAnswered(totalAnswered + 1);
+        fetchQuote();
+      } else {
+        setGameOver(true);
+      }
+      console.log('Answer processed successfully'); // Log success
+    } catch (error) {
+      console.error('Error processing answer:', error); // Log any fetch errors
+    }
+  };  
 
   const shareStats = () => {
     window.open(shareLink, '_blank');
