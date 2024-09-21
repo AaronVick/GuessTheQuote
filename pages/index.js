@@ -22,6 +22,7 @@ export default function Home() {
     setQuote(data.quote);
     setCorrectAuthor(data.correctAuthor);
     setWrongAuthor(data.wrongAuthor);
+    setGameOver(false);
   };
 
   const handleAnswer = async (selectedAuthor) => {
@@ -40,6 +41,10 @@ export default function Home() {
     }
   };
 
+  const shareStats = () => {
+    window.open(shareLink, '_blank');
+  };
+
   if (gameOver) {
     return (
       <div>
@@ -47,15 +52,15 @@ export default function Home() {
           <meta property="fc:frame" content="vNext" />
           <meta property="fc:frame:image" content={`${process.env.NEXT_PUBLIC_BASE_URL}/guessQuote.png`} />
           <meta property="fc:frame:button:1" content="Play Again" />
-          <meta property="fc:frame:button:1:action" content="reload" />
+          <meta property="fc:frame:button:1:type" content="link" /> {/* Updated to not reload */}
           <meta property="fc:frame:button:2" content="Share" />
-          <meta property="fc:frame:button:2:action" content="link" />
+          <meta property="fc:frame:button:2:type" content="link" />
           <meta property="fc:frame:button:2:target" content={shareLink} />
         </Head>
         <h1>Game Over!</h1>
         <p>You got {totalAnswered} quotes correct.</p>
-        <button onClick={fetchQuote}>Play Again</button>
-        <button onClick={() => window.open(shareLink, '_blank')}>Share</button>
+        <button onClick={fetchQuote}>Play Again</button> {/* No reload, just restarts game */}
+        <button onClick={shareStats}>Share</button>
       </div>
     );
   }
@@ -69,9 +74,9 @@ export default function Home() {
         <meta property="fc:frame" content="vNext" />
         <meta property="fc:frame:image" content={`${process.env.NEXT_PUBLIC_BASE_URL}/guessQuote.png`} />
         <meta property="fc:frame:button:1" content="Play the Game" />
-        <meta property="fc:frame:button:1:action" content="reload" />
+        <meta property="fc:frame:button:1:type" content="link" />
         <meta property="fc:frame:button:2" content="Share" />
-        <meta property="fc:frame:button:2:action" content="link" />
+        <meta property="fc:frame:button:2:type" content="link" />
         <meta property="fc:frame:button:2:target" content={shareLink} />
       </Head>
       <img src="/guessQuote.png" alt="Guess the Quote" />
