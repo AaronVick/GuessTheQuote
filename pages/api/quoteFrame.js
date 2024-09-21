@@ -1,4 +1,8 @@
 export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+
   const quoteResponse = await fetch('https://favqs.com/api/qotd', {
     headers: {
       'Authorization': `Bearer ${process.env.FAVQS_API_KEY}`
@@ -17,7 +21,7 @@ export default async function handler(req, res) {
     });
     const anotherQuoteData = await anotherQuoteResponse.json();
     wrongAuthor = anotherQuoteData.quote.author;
-  } while (wrongAuthor === correctAuthor); // Ensure wrong author is not the same as correct
+  } while (wrongAuthor === correctAuthor);
 
   res.status(200).json({
     quote: quoteData.quote.body,
