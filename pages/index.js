@@ -8,6 +8,10 @@ export default function Home() {
   const [totalAnswered, setTotalAnswered] = useState(0);
   const [gameOver, setGameOver] = useState(false);
 
+  // Define shareLink globally for consistent access
+  const shareText = encodeURIComponent(`I guessed ${totalAnswered} quotes correctly! Play the Quote Game here: `);
+  const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(process.env.NEXT_PUBLIC_BASE_URL)}`;
+
   useEffect(() => {
     fetchQuote();
   }, []);
@@ -36,13 +40,6 @@ export default function Home() {
     }
   };
 
-  const shareStats = () => {
-    const shareText = encodeURIComponent(`I guessed ${totalAnswered} quotes correctly! Play the Quote Game here: `);
-    const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(process.env.NEXT_PUBLIC_BASE_URL)}`;
-    
-    window.open(shareLink, '_blank');
-  };
-
   if (gameOver) {
     return (
       <div>
@@ -57,7 +54,7 @@ export default function Home() {
         <h1>Game Over!</h1>
         <p>You got {totalAnswered} quotes correct.</p>
         <button onClick={fetchQuote}>Play Again</button>
-        <button onClick={shareStats}>Share</button>
+        <button onClick={() => window.open(shareLink, '_blank')}>Share</button>
       </div>
     );
   }
