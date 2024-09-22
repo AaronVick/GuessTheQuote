@@ -24,19 +24,19 @@ export default function handler(req) {
           fontWeight: 600,
         }}
       >
-        <div style={{ marginBottom: 10, color: '#1da1f2' }}>Quote Game</div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {quote && (
-            <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
-              "{quote}"
-            </div>
-          )}
-          {message && (
-            <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
-              {message}
-            </div>
-          )}
+        <div style={{ marginBottom: 10, color: '#1da1f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          Quote Game
         </div>
+        {quote && (
+          <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            "{quote}"
+          </div>
+        )}
+        {message && (
+          <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {message}
+          </div>
+        )}
       </div>
     ),
     {
