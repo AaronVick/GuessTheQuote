@@ -14,19 +14,13 @@ export default async function handler(req, res) {
     const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
     
     res.status(200).json({
-      frame: {
-        version: 'vNext',
-        image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
-        buttons: [
-          { label: correctAuthor },
-          { label: wrongAuthor }
-        ],
-        post_url: `${baseUrl}/api/frame`,
-      },
-      state: {
-        correctAuthor,
-        totalAnswered: untrustedData?.state?.totalAnswered || 0,
-      },
+      version: 'vNext',
+      image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
+      buttons: [
+        { label: correctAuthor },
+        { label: wrongAuthor }
+      ],
+      post_url: `${baseUrl}/api/frame`,
     });
   } else {
     // Handle answer
@@ -39,16 +33,13 @@ export default async function handler(req, res) {
       : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You guessed ${totalAnswered} quotes correctly.`;
 
     res.status(200).json({
-      frame: {
-        version: 'vNext',
-        image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
-        buttons: [
-          { label: 'Next Quote' },
-          { label: 'End Game' },
-        ],
-        post_url: `${baseUrl}/api/frame`,
-      },
-      state: { totalAnswered },
+      version: 'vNext',
+      image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
+      buttons: [
+        { label: 'Next Quote' },
+        { label: 'End Game' },
+      ],
+      post_url: `${baseUrl}/api/frame`,
     });
   }
 }
