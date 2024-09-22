@@ -23,16 +23,18 @@ export default async function handler(req, res) {
             <meta property="fc:frame:button:1" content="${correctAuthor}" />
             <meta property="fc:frame:button:2" content="${wrongAuthor}" />
             <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: untrustedData?.state?.totalAnswered || 0 }))}" />
           </head>
         </html>
       `;
     } else {
-      const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + 1;
-      const selectedAuthor = buttonIndex === 2 ? untrustedData?.state?.wrongAuthor : untrustedData?.state?.correctAuthor;
-      const isCorrect = selectedAuthor === untrustedData?.state?.correctAuthor;
+      const state = JSON.parse(decodeURIComponent(untrustedData?.state || '{}'));
+      const totalAnswered = (state.totalAnswered || 0) + 1;
+      const selectedAuthor = buttonIndex === 2 ? state.wrongAuthor : state.correctAuthor;
+      const isCorrect = selectedAuthor === state.correctAuthor;
       const message = isCorrect 
         ? `Correct! The author was ${selectedAuthor}. You've guessed ${totalAnswered} quotes correctly.` 
-        : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You've guessed ${totalAnswered - 1} quotes correctly.`;
+        : `Wrong. The correct author was ${state.correctAuthor}. You've guessed ${totalAnswered - 1} quotes correctly.`;
       
       console.log('Response message:', message);
 
@@ -44,6 +46,7 @@ export default async function handler(req, res) {
             <meta property="fc:frame:button:1" content="Next Quote" />
             <meta property="fc:frame:button:2" content="Share" />
             <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered }))}" />
           </head>
         </html>
       `;

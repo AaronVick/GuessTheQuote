@@ -27,7 +27,7 @@ export default function handler(req) {
           <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#4CAF50', marginBottom: '20px' }}>
             Quote Game
           </div>
-          <div style={{ fontSize: '24px', textAlign: 'center', maxWidth: '80%', wordWrap: 'break-word' }}>
+          <div style={{ fontSize: '27px', textAlign: 'center', maxWidth: '80%', wordWrap: 'break-word' }}>
             {quote ? `"${quote}"` : message}
           </div>
         </div>
