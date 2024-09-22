@@ -41,6 +41,17 @@ export default async function handler(req, res) {
             <meta property="fc:frame:button:2" content="Share" />
             <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
           </head>
+          <style>
+            body {
+              background-color: #121212;
+              color: #FFFFFF;
+              font-family: Arial, sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+            }
+          </style>
         </html>
       `;
     }
