@@ -5,11 +5,11 @@ export default function Home({ initialMetaTags }) {
     <div>
       <Head>
         <title>Guess the Quote</title>
-        <meta property="og:title" content="Guess the Quote Game" />
-        <meta property="og:image" content="https://guess-the-quote-mauve.vercel.app/guessQuote.png" />
-        {initialMetaTags.map((tag, index) => (
-          <meta key={index} {...tag} />
-        ))}
+        <meta property="fc:frame" content="vNext" />
+        <meta property="fc:frame:image" content="/guessQuote.png" />
+        <meta property="fc:frame:button:1" content="Play the Game" />
+        <meta property="fc:frame:post_url" content="/api/frame" />
+        <dangerouslySetInnerHTML={{ __html: initialMetaTags }} />
       </Head>
       <h1>Guess the Quote</h1>
       <img
@@ -18,25 +18,25 @@ export default function Home({ initialMetaTags }) {
         width="600"
         height="300"
       />
+      <button
+        onClick={() => window.location.href = '/api/start-game'}
+        style={{ marginTop: '20px', padding: '10px 20px', fontSize: '16px' }}
+      >
+        Play the Game
+      </button>
     </div>
   );
 }
 
 export async function getServerSideProps() {
-  const baseUrl = 'https://guess-the-quote-mauve.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://guess-the-quote-mauve.vercel.app';
   
-  const shareText = encodeURIComponent(`Check out this awesome Quote Game!\n\nFrame by @aaronv.eth`);
-  const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
-
-  const initialMetaTags = [
-    { property: "fc:frame", content: "vNext" },
-    { property: "fc:frame:image", content: `${baseUrl}/guessQuote.png` },
-    { property: "fc:frame:button:1", content: "Play the Game" },
-    { property: "fc:frame:button:2", content: "Share" },
-    { property: "fc:frame:button:2:action", content: "link" },
-    { property: "fc:frame:button:2:target", content: shareLink },
-    { property: "fc:frame:post_url", content: `${baseUrl}/api/start-game` },
-  ];
+  const initialMetaTags = `
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${baseUrl}/guessQuote.png" />
+    <meta property="fc:frame:button:1" content="Play the Game" />
+    <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+  `;
 
   return {
     props: {

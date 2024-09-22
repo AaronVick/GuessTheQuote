@@ -1,19 +1,46 @@
-export default function handler(req, res) {
-  const { quote, authors, ogImageUrl } = req.body;
+import { fetchQuote } from '../../utils/quoteService';
 
-  res.status(200).json({
-    "fc:frame:image": ogImageUrl,
-    "fc:frame:quote": quote,
-    "fc:frame:button:1": {
-      type: "reload",
-      title: "Play Again",
-    },
-    "fc:frame:button:2": {
-      type: "link",
-      title: "Share",
-      target: `https://warpcast.com/~/compose?text=${encodeURIComponent(
-        `I guessed the quote: "${quote}" correctly!`
-      )}&embeds[]=${encodeURIComponent(ogImageUrl)}`,
-    },
-  });
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+
+  const baseUrl = 'https://guess-the-quote-mauve.vercel.app';
+  const { untrustedData } = req.body;
+  const buttonIndex = untrustedData?.buttonIndex;
+
+  try {
+    if (!buttonIndex || buttonIndex === 1) {
+      const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
+      
+      res.status(200).json({
+        version: 'vNext',
+        og: {
+          image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
+        },
+        frames: [
+          { "button": correctAuthor, "target": `${baseUrl}/api/frame` },
+          { "button": wrongAuthor, "target": `${baseUrl}/api/frame` }
+        ]
+      });
+    } else {
+      const isCorrect = untrustedData?.state?.correctAuthor === buttonIndex;
+      const message = isCorrect
+        ? 'Correct! You guessed the quote.'
+        : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}.`;
+
+      res.status(200).json({
+        version: 'vNext',
+        og: {
+          image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
+        },
+        frames: [
+          { "button": "Next Quote", "target": `${baseUrl}/api/frame` },
+          { "button": "End Game", "target": `${baseUrl}/api/frame` }
+        ]
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 }
