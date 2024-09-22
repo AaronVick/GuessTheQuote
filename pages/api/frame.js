@@ -13,6 +13,7 @@ export default async function handler(req, res) {
     let html = '';
     if (!buttonIndex || buttonIndex === 1) {
       const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
+      console.log('Fetched quote:', quote);
 
       html = `
         <html>
@@ -32,6 +33,8 @@ export default async function handler(req, res) {
       const message = isCorrect 
         ? `Correct! The author was ${selectedAuthor}. You've guessed ${totalAnswered} quotes correctly.` 
         : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You've guessed ${totalAnswered - 1} quotes correctly.`;
+      
+      console.log('Response message:', message);
 
       html = `
         <html>
@@ -46,6 +49,7 @@ export default async function handler(req, res) {
       `;
     }
 
+    console.log('Sending HTML response:', html);
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(html);
   } catch (error) {
