@@ -1,9 +1,13 @@
+import { ImageResponse } from '@vercel/og';
+
 export const config = {
   runtime: 'edge',
 };
 
 export default function handler(req) {
-  const { quote, message } = req.query;
+  const { searchParams } = new URL(req.url);
+  const quote = searchParams.get('quote');
+  const message = searchParams.get('message');
 
   return new ImageResponse(
     (

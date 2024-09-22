@@ -21,7 +21,7 @@ export default async function handler(req, res) {
           { label: correctAuthor },
           { label: wrongAuthor }
         ],
-        post_url: `${baseUrl}/api/frame`,
+        post_url: `${baseUrl}/api/frame`
       });
     } else {
       // Handle answer
@@ -31,28 +31,25 @@ export default async function handler(req, res) {
         ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
         : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
 
-      const shareText = encodeURIComponent(`I guessed ${totalAnswered} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`);
-      const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
-
       res.status(200).json({
         version: 'vNext',
         image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
         buttons: [
           { label: 'Next Quote' },
-          { label: 'Share', action: 'link', target: shareLink },
+          { label: 'Share', action: 'link', target: `https://warpcast.com/~/compose?text=${encodeURIComponent(`I guessed ${totalAnswered} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`)}&embeds[]=${encodeURIComponent(baseUrl)}` },
         ],
-        post_url: `${baseUrl}/api/frame`,
+        post_url: `${baseUrl}/api/frame`
       });
     }
   } catch (error) {
     console.error('Error in frame handler:', error);
     res.status(500).json({
       version: 'vNext',
-      image: `${baseUrl}/api/og?message=An error occurred`,
+      image: `${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}`,
       buttons: [
-        { label: 'Try Again' },
+        { label: 'Try Again' }
       ],
-      post_url: `${baseUrl}/api/frame`,
+      post_url: `${baseUrl}/api/frame`
     });
   }
 }
