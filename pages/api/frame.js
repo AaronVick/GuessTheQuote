@@ -13,16 +13,18 @@ export default async function handler(req, res) {
     if (!buttonIndex || buttonIndex === 1) {
       const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
 
+      // Prepare the frame response
       res.status(200).json({
         version: 'vNext',
         image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
         buttons: [
-          { label: correctAuthor },
-          { label: wrongAuthor }
+          { label: correctAuthor, action: 'post', target: `${baseUrl}/api/frame` },
+          { label: wrongAuthor, action: 'post', target: `${baseUrl}/api/frame` }
         ],
         post_url: `${baseUrl}/api/frame`
       });
     } else {
+      // Handle answer selection
       const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 2 ? 1 : 0);
       const isCorrect = buttonIndex === 2;
       const message = isCorrect 
@@ -33,7 +35,7 @@ export default async function handler(req, res) {
         version: 'vNext',
         image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
         buttons: [
-          { label: 'Next Quote' },
+          { label: 'Next Quote', action: 'post', target: `${baseUrl}/api/frame` },
           { label: 'Share', action: 'link', target: `https://warpcast.com/~/compose?text=${encodeURIComponent(`I guessed ${totalAnswered} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`)}&embeds[]=${encodeURIComponent(baseUrl)}` },
         ],
         post_url: `${baseUrl}/api/frame`
@@ -45,7 +47,7 @@ export default async function handler(req, res) {
       version: 'vNext',
       image: `${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}`,
       buttons: [
-        { label: 'Try Again' }
+        { label: 'Try Again', action: 'post', target: `${baseUrl}/api/frame` }
       ],
       post_url: `${baseUrl}/api/frame`
     });
