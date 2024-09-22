@@ -1,3 +1,9 @@
+import { ImageResponse } from '@vercel/og';
+
+export const config = {
+  runtime: 'edge',
+};
+
 export default function handler(req) {
   const { searchParams } = new URL(req.url);
   const quote = searchParams.get('quote');
@@ -14,24 +20,24 @@ export default function handler(req) {
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: '#121212',
+          color: '#FFFFFF',
           fontSize: 32,
           fontWeight: 600,
-          color: '#FFFFFF',
         }}
       >
-        <div style={{ marginBottom: 10, color: '#f0f0f0' }}>
-          Quote Game
+        <div style={{ marginBottom: 20, color: '#4CAF50' }}>Quote Game</div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {quote && (
+            <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
+              "{quote}"
+            </div>
+          )}
+          {message && (
+            <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
+              {message}
+            </div>
+          )}
         </div>
-        {quote && (
-          <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
-            "{quote}"
-          </div>
-        )}
-        {message && (
-          <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
-            {message}
-          </div>
-        )}
       </div>
     ),
     {
