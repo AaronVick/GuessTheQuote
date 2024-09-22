@@ -59,6 +59,9 @@ export default async function handler(req, res) {
         
         console.log('Response message:', message);
 
+        const shareText = encodeURIComponent(`I've guessed ${totalAnswered} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`);
+        const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
+
         html = `
           <html>
             <head>
@@ -66,6 +69,8 @@ export default async function handler(req, res) {
               <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(message)}" />
               <meta property="fc:frame:button:1" content="Next Quote" />
               <meta property="fc:frame:button:2" content="Share" />
+              <meta property="fc:frame:button:2:action" content="link" />
+              <meta property="fc:frame:button:2:target" content="${shareLink}" />
               <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
               <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, stage: 'result' }))}" />
             </head>
