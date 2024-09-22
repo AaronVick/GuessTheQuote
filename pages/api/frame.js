@@ -1,88 +1,19 @@
-import { fetchQuote } from '../../utils/quoteService';
+export default function handler(req, res) {
+  const { quote, authors, ogImageUrl } = req.body;
 
-export default async function handler(req, res) {
-  console.log('Frame API called');
-  console.log('Request method:', req.method);
-  console.log('Request body:', JSON.stringify(req.body, null, 2));
-
-  if (req.method !== 'POST') {
-    console.log('Method not allowed');
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
-  const baseUrl = 'https://guess-the-quote-mauve.vercel.app';
-  const { untrustedData } = req.body;
-  
-  console.log('Untrusted data:', JSON.stringify(untrustedData, null, 2));
-  
-  const buttonIndex = untrustedData?.buttonIndex;
-  console.log('Button index:', buttonIndex);
-
-  try {
-    if (!buttonIndex || buttonIndex === 1) {
-      console.log('Fetching new quote');
-      const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
-      console.log('Quote fetched:', quote);
-      console.log('Correct author:', correctAuthor);
-      console.log('Wrong author:', wrongAuthor);
-      
-      const response = {
-        version: 'vNext',
-        og: {
-          image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
-        },
-        frames: [
-          {
-            "button": correctAuthor,
-            "target": `${baseUrl}/api/frame`
-          },
-          {
-            "button": wrongAuthor,
-            "target": `${baseUrl}/api/frame`
-          }
-        ]
-      };
-      
-      console.log('Sending response:', JSON.stringify(response, null, 2));
-      res.status(200).json(response);
-    } else {
-      console.log('Handling answer');
-      const selectedAuthor = buttonIndex === 2 ? untrustedData?.state?.correctAuthor : '';
-      const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (selectedAuthor === untrustedData?.state?.correctAuthor ? 1 : 0);
-
-      console.log('Selected author:', selectedAuthor);
-      console.log('Total answered:', totalAnswered);
-
-      const isCorrect = selectedAuthor === untrustedData?.state?.correctAuthor;
-      const message = isCorrect 
-        ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
-        : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You guessed ${totalAnswered} quotes correctly.`;
-
-      console.log('Is correct:', isCorrect);
-      console.log('Message:', message);
-
-      const response = {
-        version: 'vNext',
-        og: {
-          image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
-        },
-        frames: [
-          {
-            "button": "Next Quote",
-            "target": `${baseUrl}/api/frame`
-          },
-          {
-            "button": "End Game",
-            "target": `${baseUrl}/api/frame`
-          }
-        ]
-      };
-
-      console.log('Sending response:', JSON.stringify(response, null, 2));
-      res.status(200).json(response);
-    }
-  } catch (error) {
-    console.error('Error in frame handler:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+  res.status(200).json({
+    "fc:frame:image": ogImageUrl,
+    "fc:frame:quote": quote,
+    "fc:frame:button:1": {
+      type: "reload",
+      title: "Play Again",
+    },
+    "fc:frame:button:2": {
+      type: "link",
+      title: "Share",
+      target: `https://warpcast.com/~/compose?text=${encodeURIComponent(
+        `I guessed the quote: "${quote}" correctly!`
+      )}&embeds[]=${encodeURIComponent(ogImageUrl)}`,
+    },
+  });
 }

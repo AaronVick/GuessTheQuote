@@ -1,20 +1,14 @@
-import { fetchQuote } from '../../utils/quoteService';
+import { getQuoteAndAuthors } from '../../utils/quoteService';
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
+  const { quote, authors } = await getQuoteAndAuthors();
 
-  const baseUrl = 'https://guess-the-quote-mauve.vercel.app';
-  const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
+  // Generate a vercel OG image URL
+  const ogImageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/og?quote=${encodeURIComponent(quote)}&author1=${encodeURIComponent(authors[0])}&author2=${encodeURIComponent(authors[1])}`;
 
   res.status(200).json({
-    version: 'vNext',
-    image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
-    buttons: [
-      { label: correctAuthor },
-      { label: wrongAuthor }
-    ],
-    post_url: `${baseUrl}/api/answer`,
+    quote,
+    authors,
+    ogImageUrl,
   });
 }
