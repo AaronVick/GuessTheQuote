@@ -5,7 +5,14 @@ export default function Home({ initialMetaTags }) {
     <div>
       <Head>
         <title>Guess the Quote</title>
-        <dangerouslySetInnerHTML={{ __html: initialMetaTags }} />
+        <meta name="description" content="A fun game to guess the authors of famous quotes" />
+        <meta property="og:title" content="Guess the Quote Game" />
+        <meta property="og:description" content="Test your knowledge of famous quotes and their authors" />
+        <meta property="og:image" content="https://guess-the-quote-mauve.vercel.app/guessQuote.png" />
+        <meta property="fc:frame" content="vNext" />
+        <meta property="fc:frame:image" content={`${process.env.NEXT_PUBLIC_BASE_URL}/guessQuote.png`} />
+        <meta property="fc:frame:button:1" content="Play the Game" />
+        <meta property="fc:frame:post_url" content={`${process.env.NEXT_PUBLIC_BASE_URL}/api/frame`} />
       </Head>
       <h1>Guess the Quote</h1>
       <img
@@ -19,18 +26,7 @@ export default function Home({ initialMetaTags }) {
 }
 
 export async function getServerSideProps() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://guess-the-quote-mauve.vercel.app';
-  
-  const initialMetaTags = `
-    <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="${baseUrl}/guessQuote.png" />
-    <meta property="fc:frame:button:1" content="Play the Game" />
-    <meta property="fc:frame:post_url" content="${baseUrl}api/frame" />
-  `;
-
   return {
-    props: {
-      initialMetaTags,
-    },
+    props: {},
   };
 }
