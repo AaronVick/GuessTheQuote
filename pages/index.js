@@ -5,6 +5,8 @@ export default function Home({ initialMetaTags }) {
     <div>
       <Head>
         <title>Guess the Quote</title>
+        <meta property="og:title" content="Guess the Quote Game" />
+        <meta property="og:image" content="https://guess-the-quote-mauve.vercel.app/guessQuote.png" />
         <dangerouslySetInnerHTML={{ __html: initialMetaTags }} />
       </Head>
       <h1>Guess the Quote</h1>
@@ -19,7 +21,7 @@ export default function Home({ initialMetaTags }) {
 }
 
 export async function getServerSideProps() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://guess-the-quote-mauve.vercel.app';
+  const baseUrl = 'https://guess-the-quote-mauve.vercel.app';
   
   const initialMetaTags = `
     <meta property="fc:frame" content="vNext" />

@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://guess-the-quote-mauve.vercel.app';
+  const baseUrl = 'https://guess-the-quote-mauve.vercel.app';
   const { untrustedData } = req.body;
   const buttonIndex = untrustedData?.buttonIndex;
 
