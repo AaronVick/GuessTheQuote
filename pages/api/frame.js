@@ -14,20 +14,11 @@ export default async function handler(req, res) {
       const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
 
       res.status(200).json({
-        og: {
-          title: "Guess the Quote Game",
-          description: "Test your knowledge of famous quotes!",
-          image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`
-        },
-        frames: [
-          {
-            version: "vNext",
-            image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
-            button_1: correctAuthor,
-            button_2: wrongAuthor,
-            post_url: `${baseUrl}/api/frame`
-          }
-        ],
+        "fc:frame": "vNext",
+        "fc:frame:image": `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
+        "fc:frame:button:1": correctAuthor,
+        "fc:frame:button:2": wrongAuthor,
+        "fc:frame:post_url": `${baseUrl}/api/frame`
       });
     } else {
       const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 2 ? 1 : 0);
@@ -37,38 +28,20 @@ export default async function handler(req, res) {
         : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
 
       res.status(200).json({
-        og: {
-          title: "Guess the Quote Game - Result",
-          description: message,
-          image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`
-        },
-        frames: [
-          {
-            version: "vNext",
-            image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
-            button_1: "Next Quote",
-            button_2: "Share",
-            post_url: `${baseUrl}/api/frame`
-          }
-        ],
+        "fc:frame": "vNext",
+        "fc:frame:image": `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
+        "fc:frame:button:1": "Next Quote",
+        "fc:frame:button:2": "Share",
+        "fc:frame:post_url": `${baseUrl}/api/frame`
       });
     }
   } catch (error) {
     console.error('Error in frame handler:', error);
-    res.status(500).json({
-      og: {
-        title: "Guess the Quote Game - Error",
-        description: "An error occurred. Please try again.",
-        image: `${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}`
-      },
-      frames: [
-        {
-          version: "vNext",
-          image: `${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}`,
-          button_1: "Try Again",
-          post_url: `${baseUrl}/api/frame`
-        }
-      ],
+    res.status(200).json({
+      "fc:frame": "vNext",
+      "fc:frame:image": `${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}`,
+      "fc:frame:button:1": "Try Again",
+      "fc:frame:post_url": `${baseUrl}/api/frame`
     });
   }
 }
