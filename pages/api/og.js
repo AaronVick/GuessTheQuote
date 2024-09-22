@@ -19,25 +19,23 @@ export default function handler(req) {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#121212',
+          backgroundColor: '#1E1E1E',
           color: '#FFFFFF',
           fontSize: 32,
           fontWeight: 600,
         }}
       >
         <div style={{ marginBottom: 20, color: '#4CAF50' }}>Quote Game</div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {quote && (
-            <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
-              "{quote}"
-            </div>
-          )}
-          {message && (
-            <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
-              {message}
-            </div>
-          )}
-        </div>
+        {quote && (
+          <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
+            "{quote}"
+          </div>
+        )}
+        {message && (
+          <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
+            {message}
+          </div>
+        )}
       </div>
     ),
     {
