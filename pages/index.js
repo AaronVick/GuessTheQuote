@@ -35,7 +35,7 @@ export async function getServerSideProps() {
     { property: "fc:frame", content: "vNext" },
     { property: "fc:frame:image", content: `${baseUrl}/guessQuote.png` },
     { property: "fc:frame:button:1", content: "Play the Game" },
-    { property: "fc:frame:post_url", content: `${baseUrl}/api/frame` },
+    { property: "fc:frame:button:1:target", content: `${baseUrl}/api/frame` },
   ];
 
   console.log('Generated initial meta tags:', JSON.stringify(initialMetaTags, null, 2));

@@ -28,12 +28,19 @@ export default async function handler(req, res) {
       
       const response = {
         version: 'vNext',
-        image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
-        buttons: [
-          { label: correctAuthor },
-          { label: wrongAuthor }
-        ],
-        post_url: `${baseUrl}/api/frame`,
+        og: {
+          image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
+        },
+        frames: [
+          {
+            "button": correctAuthor,
+            "target": `${baseUrl}/api/frame`
+          },
+          {
+            "button": wrongAuthor,
+            "target": `${baseUrl}/api/frame`
+          }
+        ]
       };
       
       console.log('Sending response:', JSON.stringify(response, null, 2));
@@ -56,12 +63,19 @@ export default async function handler(req, res) {
 
       const response = {
         version: 'vNext',
-        image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
-        buttons: [
-          { label: 'Next Quote' },
-          { label: 'End Game' },
-        ],
-        post_url: `${baseUrl}/api/frame`,
+        og: {
+          image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
+        },
+        frames: [
+          {
+            "button": "Next Quote",
+            "target": `${baseUrl}/api/frame`
+          },
+          {
+            "button": "End Game",
+            "target": `${baseUrl}/api/frame`
+          }
+        ]
       };
 
       console.log('Sending response:', JSON.stringify(response, null, 2));
