@@ -7,8 +7,8 @@ export async function fetchQuote() {
   const quoteData = await quoteResponse.json();
 
   const correctAuthor = quoteData.quote.author;
-
   let wrongAuthor = '';
+
   do {
     const anotherQuoteResponse = await fetch('https://favqs.com/api/qotd', {
       headers: {
@@ -19,9 +19,5 @@ export async function fetchQuote() {
     wrongAuthor = anotherQuoteData.quote.author;
   } while (wrongAuthor === correctAuthor);
 
-  return {
-    quote: quoteData.quote.body,
-    correctAuthor,
-    wrongAuthor,
-  };
+  return { quote: quoteData.quote.body, correctAuthor, wrongAuthor };
 }

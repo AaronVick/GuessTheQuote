@@ -22,9 +22,7 @@ export default function handler(req) {
           fontWeight: 600,
         }}
       >
-        <div style={{ marginBottom: 10, color: '#1da1f2' }}>
-          Quote Game
-        </div>
+        <div style={{ marginBottom: 10, color: '#1da1f2' }}>Quote Game</div>
         {quote && (
           <div style={{ textAlign: 'center', margin: '20px 0', maxWidth: '80%' }}>
             "{quote}"
