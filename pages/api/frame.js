@@ -1,76 +1,42 @@
-import { fetchQuote } from '../../utils/quoteService';
-
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://guess-the-quote-mauve.vercel.app';
-  const { untrustedData } = req.body;
-  const buttonIndex = untrustedData?.buttonIndex;
-
-  try {
-    let html = '';
-    if (!buttonIndex || buttonIndex === 1) {
-      const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
-
-      html = `
-        <html>
-          <head>
-            <meta property="fc:frame" content="vNext" />
-            <meta property="fc:frame:image" content="${baseUrl}/api/og?quote=${encodeURIComponent(quote)}" />
-            <meta property="fc:frame:button:1" content="${correctAuthor}" />
-            <meta property="fc:frame:button:2" content="${wrongAuthor}" />
-            <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-          </head>
-        </html>
-      `;
-    } else {
-      const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 2 ? 1 : 0);
-      const isCorrect = buttonIndex === 2;
-      const message = isCorrect 
-        ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
-        : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
-
-      html = `
-        <html>
-          <head>
-            <meta property="fc:frame" content="vNext" />
-            <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(message)}" />
-            <meta property="fc:frame:button:1" content="Next Quote" />
-            <meta property="fc:frame:button:2" content="Share" />
-            <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-          </head>
-          <style>
-            body {
-              background-color: #121212;
-              color: #FFFFFF;
-              font-family: Arial, sans-serif;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              height: 100vh;
-            }
-          </style>
-        </html>
-      `;
+<html>
+  <head>
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${baseUrl}/api/og?quote=${encodeURIComponent(quote)}" />
+    <meta property="fc:frame:button:1" content="${correctAuthor}" />
+    <meta property="fc:frame:button:2" content="${wrongAuthor}" />
+    <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+  </head>
+  <style>
+    body {
+      background-color: #121212;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-
-    res.setHeader('Content-Type', 'text/html');
-    res.status(200).send(html);
-  } catch (error) {
-    console.error('Error in frame handler:', error);
-    const errorHtml = `
-      <html>
-        <head>
-          <meta property="fc:frame" content="vNext" />
-          <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}" />
-          <meta property="fc:frame:button:1" content="Try Again" />
-          <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-        </head>
-      </html>
-    `;
-    res.setHeader('Content-Type', 'text/html');
-    res.status(200).send(errorHtml);
-  }
-}
+    button {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #555;
+    }
+  </style>
+  <body>
+    <div style="text-align: center;">
+      <h1>Quote Game</h1>
+      <p>${quote}</p>
+      <div>
+        <button>${correctAuthor}</button>
+        <button>${wrongAuthor}</button>
+      </div>
+    </div>
+  </body>
+</html>
