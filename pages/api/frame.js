@@ -26,7 +26,7 @@ export default async function handler(req, res) {
   } else {
     // Answer submitted
     const selectedAuthor = buttonIndex === 2 ? untrustedData?.inputText : '';
-    const { correctAuthor } = await fetchQuote(); // Ensure you store the correct state for the current game to prevent re-fetching quotes.
+    const { correctAuthor } = await fetchQuote(); 
 
     const isCorrect = selectedAuthor === correctAuthor;
     const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (isCorrect ? 1 : 0);
