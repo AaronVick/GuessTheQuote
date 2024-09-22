@@ -7,19 +7,23 @@ export default async function handler(req, res) {
   const { untrustedData } = req.body;
   const buttonIndex = untrustedData?.buttonIndex;
   const correctAuthor = untrustedData?.state?.correctAuthor;
-  const isCorrect = buttonIndex === 1;
+  const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 1 ? 1 : 0);
 
+  const isCorrect = buttonIndex === 1;
   const message = isCorrect 
-    ? `Correct!`
-    : `Wrong. The correct author was ${correctAuthor}.`;
+    ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
+    : `Wrong. The correct author was ${correctAuthor}. You guessed ${totalAnswered} quotes correctly.`;
+
+  const shareText = encodeURIComponent(`I guessed ${totalAnswered} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`);
+  const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
 
   res.status(200).json({
     version: 'vNext',
-    image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
+    image: `${baseUrl}api/og?message=${encodeURIComponent(message)}`,
     buttons: [
       { label: 'Next Quote' },
-      { label: 'Share', action: 'link', target: `https://warpcast.com/~/compose?text=I guessed correctly in the Quote Game!` },
+      { label: 'Share', action: 'link', target: shareLink },
     ],
-    post_url: `${baseUrl}/api/quote`,
+    post_url: `${baseUrl}api/quote`,
   });
 }

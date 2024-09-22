@@ -1,14 +1,16 @@
-import { fetchQuote } from '../../utils/quoteService';
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  try {
-    const quoteData = await fetchQuote();
-    res.status(200).json(quoteData);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to start the game', error: error.message });
-  }
+  const baseUrl = 'https://guess-the-quote-mauve.vercel.app';
+
+  res.status(200).json({
+    version: 'vNext',
+    image: `${baseUrl}api/og`,
+    buttons: [
+      { label: 'Play', action: 'post', target: `${baseUrl}api/quote` },
+    ],
+    post_url: `${baseUrl}api/frame`,
+  });
 }

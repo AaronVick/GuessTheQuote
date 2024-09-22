@@ -10,11 +10,11 @@ export default async function handler(req, res) {
 
   res.status(200).json({
     version: 'vNext',
-    image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
+    image: `${baseUrl}api/og?quote=${encodeURIComponent(quote)}`,
     buttons: [
       { label: correctAuthor },
       { label: wrongAuthor }
     ],
-    post_url: `${baseUrl}/api/answer`,
+    post_url: `${baseUrl}api/answer`,
   });
 }
