@@ -54,8 +54,8 @@ export default async function handler(req, res) {
         const selectedAuthor = buttonIndex === 1 ? state.correctAuthor : state.wrongAuthor;
         const isCorrect = selectedAuthor === state.correctAuthor;
         const message = isCorrect 
-          ? `Correct! The author was ${selectedAuthor}. You've guessed ${totalAnswered} quotes correctly.` 
-          : `Wrong. The correct author was ${state.correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
+          ? `Correct! The author was ${selectedAuthor}.\n\n You've guessed ${totalAnswered} quotes correctly.` 
+          : `Wrong. The correct author was ${state.correctAuthor}.\n\n You've guessed ${totalAnswered} quotes correctly.`;
         
         console.log('Response message:', message);
 
