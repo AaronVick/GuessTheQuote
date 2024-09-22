@@ -11,6 +11,8 @@ export default async function handler(req, res) {
 
   try {
     let html = '';
+    const state = JSON.parse(decodeURIComponent(untrustedData?.state || '{}'));
+
     if (!buttonIndex || buttonIndex === 1) {
       const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
       console.log('Fetched quote:', quote);
@@ -23,18 +25,17 @@ export default async function handler(req, res) {
             <meta property="fc:frame:button:1" content="${correctAuthor}" />
             <meta property="fc:frame:button:2" content="${wrongAuthor}" />
             <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: untrustedData?.state?.totalAnswered || 0 }))}" />
+            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: state.totalAnswered || 0, stage: 'question' }))}" />
           </head>
         </html>
       `;
-    } else {
-      const state = JSON.parse(decodeURIComponent(untrustedData?.state || '{}'));
-      const totalAnswered = (state.totalAnswered || 0) + 1;
-      const selectedAuthor = buttonIndex === 2 ? state.wrongAuthor : state.correctAuthor;
+    } else if (state.stage === 'question') {
+      const totalAnswered = (state.totalAnswered || 0) + (buttonIndex === 1 ? 1 : 0);
+      const selectedAuthor = buttonIndex === 1 ? state.correctAuthor : state.wrongAuthor;
       const isCorrect = selectedAuthor === state.correctAuthor;
       const message = isCorrect 
         ? `Correct! The author was ${selectedAuthor}. You've guessed ${totalAnswered} quotes correctly.` 
-        : `Wrong. The correct author was ${state.correctAuthor}. You've guessed ${totalAnswered - 1} quotes correctly.`;
+        : `Wrong. The correct author was ${state.correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
       
       console.log('Response message:', message);
 
@@ -46,7 +47,24 @@ export default async function handler(req, res) {
             <meta property="fc:frame:button:1" content="Next Quote" />
             <meta property="fc:frame:button:2" content="Share" />
             <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered }))}" />
+            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, stage: 'result' }))}" />
+          </head>
+        </html>
+      `;
+    } else {
+      // This is for the "Next Quote" button after showing the result
+      const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
+      console.log('Fetched next quote:', quote);
+
+      html = `
+        <html>
+          <head>
+            <meta property="fc:frame" content="vNext" />
+            <meta property="fc:frame:image" content="${baseUrl}/api/og?quote=${encodeURIComponent(quote)}" />
+            <meta property="fc:frame:button:1" content="${correctAuthor}" />
+            <meta property="fc:frame:button:2" content="${wrongAuthor}" />
+            <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: state.totalAnswered || 0, stage: 'question' }))}" />
           </head>
         </html>
       `;
