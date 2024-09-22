@@ -10,16 +10,21 @@ export default async function handler(req, res) {
   const buttonIndex = untrustedData?.buttonIndex;
 
   try {
+    let html = '';
     if (!buttonIndex || buttonIndex === 1) {
       const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
 
-      res.status(200).json({
-        "fc:frame": "vNext",
-        "fc:frame:image": `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
-        "fc:frame:button:1": correctAuthor,
-        "fc:frame:button:2": wrongAuthor,
-        "fc:frame:post_url": `${baseUrl}/api/frame`
-      });
+      html = `
+        <html>
+          <head>
+            <meta property="fc:frame" content="vNext" />
+            <meta property="fc:frame:image" content="${baseUrl}/api/og?quote=${encodeURIComponent(quote)}" />
+            <meta property="fc:frame:button:1" content="${correctAuthor}" />
+            <meta property="fc:frame:button:2" content="${wrongAuthor}" />
+            <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+          </head>
+        </html>
+      `;
     } else {
       const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 2 ? 1 : 0);
       const isCorrect = buttonIndex === 2;
@@ -27,21 +32,34 @@ export default async function handler(req, res) {
         ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
         : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
 
-      res.status(200).json({
-        "fc:frame": "vNext",
-        "fc:frame:image": `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
-        "fc:frame:button:1": "Next Quote",
-        "fc:frame:button:2": "Share",
-        "fc:frame:post_url": `${baseUrl}/api/frame`
-      });
+      html = `
+        <html>
+          <head>
+            <meta property="fc:frame" content="vNext" />
+            <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(message)}" />
+            <meta property="fc:frame:button:1" content="Next Quote" />
+            <meta property="fc:frame:button:2" content="Share" />
+            <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+          </head>
+        </html>
+      `;
     }
+
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(html);
   } catch (error) {
     console.error('Error in frame handler:', error);
-    res.status(200).json({
-      "fc:frame": "vNext",
-      "fc:frame:image": `${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}`,
-      "fc:frame:button:1": "Try Again",
-      "fc:frame:post_url": `${baseUrl}/api/frame`
-    });
+    const errorHtml = `
+      <html>
+        <head>
+          <meta property="fc:frame" content="vNext" />
+          <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}" />
+          <meta property="fc:frame:button:1" content="Try Again" />
+          <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+        </head>
+      </html>
+    `;
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(errorHtml);
   }
 }
