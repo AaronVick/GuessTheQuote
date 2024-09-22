@@ -9,49 +9,48 @@ export default async function handler(req, res) {
   const { untrustedData } = req.body;
   const buttonIndex = untrustedData?.buttonIndex;
 
-  if (!buttonIndex || buttonIndex === 1) {
-    // Start the game or get next quote
-    const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
-    
-    res.status(200).json({
-      version: 'vNext',
-      image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
-      buttons: [
-        { label: correctAuthor },
-        { label: wrongAuthor }
-      ],
-      post_url: `${baseUrl}/api/frame`,
-    });
-  } else if (buttonIndex === 2) {
-    // Handle share action (this should not happen as share is a link action)
-    const shareText = encodeURIComponent(`Check out this awesome Quote Game!\n\nFrame by @aaronv.eth`);
-    const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
-    
-    res.status(200).json({
-      version: 'vNext',
-      image: `${baseUrl}/api/og?message=Thanks for sharing!`,
-      buttons: [
-        { label: 'Play Again' },
-      ],
-      post_url: `${baseUrl}/api/frame`,
-    });
-  } else {
-    // Handle answer
-    const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 2 ? 1 : 0);
-    const isCorrect = buttonIndex === 2;
-    const message = isCorrect 
-      ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
-      : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
+  try {
+    if (!buttonIndex || buttonIndex === 1) {
+      // Start the game or get next quote
+      const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
+      
+      res.status(200).json({
+        version: 'vNext',
+        image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
+        buttons: [
+          { label: correctAuthor },
+          { label: wrongAuthor }
+        ],
+        post_url: `${baseUrl}/api/frame`,
+      });
+    } else {
+      // Handle answer
+      const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 2 ? 1 : 0);
+      const isCorrect = buttonIndex === 2;
+      const message = isCorrect 
+        ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
+        : `Wrong. The correct author was ${untrustedData?.state?.correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
 
-    const shareText = encodeURIComponent(`I guessed ${totalAnswered} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`);
-    const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
+      const shareText = encodeURIComponent(`I guessed ${totalAnswered} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`);
+      const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
 
-    res.status(200).json({
+      res.status(200).json({
+        version: 'vNext',
+        image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
+        buttons: [
+          { label: 'Next Quote' },
+          { label: 'Share', action: 'link', target: shareLink },
+        ],
+        post_url: `${baseUrl}/api/frame`,
+      });
+    }
+  } catch (error) {
+    console.error('Error in frame handler:', error);
+    res.status(500).json({
       version: 'vNext',
-      image: `${baseUrl}/api/og?message=${encodeURIComponent(message)}`,
+      image: `${baseUrl}/api/og?message=An error occurred`,
       buttons: [
-        { label: 'Next Quote' },
-        { label: 'Share', action: 'link', target: shareLink },
+        { label: 'Try Again' },
       ],
       post_url: `${baseUrl}/api/frame`,
     });
