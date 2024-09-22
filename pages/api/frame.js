@@ -11,9 +11,8 @@ export default async function handler(req, res) {
 
   try {
     if (!buttonIndex || buttonIndex === 1) {
-      // Start the game or get next quote
       const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
-      
+
       res.status(200).json({
         version: 'vNext',
         image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
@@ -24,7 +23,6 @@ export default async function handler(req, res) {
         post_url: `${baseUrl}/api/frame`
       });
     } else {
-      // Handle answer
       const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 2 ? 1 : 0);
       const isCorrect = buttonIndex === 2;
       const message = isCorrect 
