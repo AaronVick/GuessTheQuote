@@ -13,16 +13,17 @@ export default async function handler(req, res) {
     console.log('Fetched quote:', { quote, correctAuthor, wrongAuthor });
 
     const html = `
-      <html>
-        <head>
-          <meta property="fc:frame" content="vNext" />
-          <meta property="fc:frame:image" content="${baseUrl}/api/og?quote=${encodeURIComponent(quote)}" />
-          <meta property="fc:frame:button:1" content="${correctAuthor}" />
-          <meta property="fc:frame:button:2" content="${wrongAuthor}" />
-          <meta property="fc:frame:post_url" content="${baseUrl}/api/answer" />
-        </head>
-      </html>
-    `;
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${baseUrl}/api/og?quote=${encodeURIComponent(quote)}" />
+    <meta property="fc:frame:button:1" content="${correctAuthor}" />
+    <meta property="fc:frame:button:2" content="${wrongAuthor}" />
+    <meta property="fc:frame:post_url" content="${baseUrl}/api/answer" />
+  </head>
+  <body></body>
+</html>`;
 
     console.log('Sending HTML response:', html);
 
@@ -32,15 +33,18 @@ export default async function handler(req, res) {
     console.error('Error in quote handler:', error);
     
     const errorHtml = `
-      <html>
-        <head>
-          <meta property="fc:frame" content="vNext" />
-          <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}" />
-          <meta property="fc:frame:button:1" content="Try Again" />
-          <meta property="fc:frame:post_url" content="${baseUrl}/api/quote" />
-        </head>
-      </html>
-    `;
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}" />
+    <meta property="fc:frame:button:1" content="Try Again" />
+    <meta property="fc:frame:post_url" content="${baseUrl}/api/quote" />
+  </head>
+  <body></body>
+</html>`;
+
+    console.log('Sending error HTML response:', errorHtml);
 
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(errorHtml);
