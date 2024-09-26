@@ -11,14 +11,40 @@ export default async function handler(req, res) {
   const correctAuthor = untrustedData?.state?.correctAuthor;
   const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 1 ? 1 : 0);
 
-  const isCorrect = buttonIndex === 1;
-  const message = isCorrect 
-    ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
-    : `Wrong. The correct author was ${correctAuthor}. You guessed ${totalAnswered} quotes correctly.`;
-
-  console.log('Answer data:', { buttonIndex, correctAuthor, totalAnswered, isCorrect, message });
+  console.log('Received data:', { buttonIndex, correctAuthor, totalAnswered, untrustedData });
 
   try {
+    if (buttonIndex === 2) {
+      // Handle share action
+      const shareText = encodeURIComponent(`I've guessed ${totalAnswered} quotes correctly in the Quote Game! Can you beat my score?\n\nPlay now:`);
+      const shareUrl = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
+      
+      const html = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(`Share your score: ${totalAnswered} correct guesses!`)}" />
+    <meta property="fc:frame:button:1" content="Back to Game" />
+    <meta property="fc:frame:button:2" content="Share Score" />
+    <meta property="fc:frame:button:2:action" content="link" />
+    <meta property="fc:frame:button:2:target" content="${shareUrl}" />
+    <meta property="fc:frame:post_url" content="${baseUrl}/api/start-game" />
+  </head>
+  <body></body>
+</html>`;
+
+      console.log('Sending share HTML response:', html);
+      res.setHeader('Content-Type', 'text/html');
+      res.status(200).send(html);
+      return;
+    }
+
+    const isCorrect = buttonIndex === 1;
+    const message = isCorrect 
+      ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
+      : `Wrong. The correct author was ${correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
+
     // Fetch a new quote for the next round
     const { quote, correctAuthor: newCorrectAuthor, wrongAuthor: newWrongAuthor } = await fetchQuote();
     
@@ -31,20 +57,15 @@ export default async function handler(req, res) {
     <meta property="fc:frame" content="vNext" />
     <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(message)}" />
     <meta property="fc:frame:button:1" content="Next Quote" />
-    <meta property="fc:frame:button:2" content="Share" />
-    <meta property="fc:frame:button:2:action" content="post_redirect" />
-    <meta property="fc:frame:post_url" content="${baseUrl}/api/start-game" />
-    <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered }))}" />
+    <meta property="fc:frame:button:2" content="Share Score" />
+    <meta property="fc:frame:post_url" content="${baseUrl}/api/answer" />
+    <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, correctAuthor: newCorrectAuthor, wrongAuthor: newWrongAuthor }))}" />
   </head>
   <body></body>
 </html>`;
 
-    console.log('Sending HTML response:', html);
-
+    console.log('Sending game HTML response:', html);
     res.setHeader('Content-Type', 'text/html');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.status(200).send(html);
   } catch (error) {
     console.error('Error in answer handler:', error);
@@ -62,11 +83,7 @@ export default async function handler(req, res) {
 </html>`;
 
     console.log('Sending error HTML response:', errorHtml);
-
     res.setHeader('Content-Type', 'text/html');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.status(200).send(errorHtml);
   }
 }
