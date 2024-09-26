@@ -5,16 +5,38 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const baseUrl = 'https://guess-the-quote-mauve.vercel.app';
-  const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://guess-the-quote-mauve.vercel.app';
 
-  res.status(200).json({
-    version: 'vNext',
-    image: `${baseUrl}api/og?quote=${encodeURIComponent(quote)}`,
-    buttons: [
-      { label: correctAuthor },
-      { label: wrongAuthor }
-    ],
-    post_url: `${baseUrl}api/answer`,
-  });
+  try {
+    const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
+    
+    console.log('Fetched quote:', { quote, correctAuthor, wrongAuthor });
+
+    const response = {
+      version: 'vNext',
+      image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
+      buttons: [
+        { label: correctAuthor },
+        { label: wrongAuthor }
+      ],
+      post_url: `${baseUrl}/api/answer`,
+    };
+
+    console.log('Sending response:', response);
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error in quote handler:', error);
+    
+    const errorResponse = {
+      version: 'vNext',
+      image: `${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}`,
+      buttons: [
+        { label: 'Try Again' }
+      ],
+      post_url: `${baseUrl}/api/quote`,
+    };
+
+    res.status(200).json(errorResponse);
+  }
 }
