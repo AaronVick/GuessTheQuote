@@ -2,7 +2,7 @@ import { fetchQuote } from '../../utils/quoteService';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return res.status(405).send('Method Not Allowed');
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://guess-the-quote-mauve.vercel.app';
@@ -12,31 +12,37 @@ export default async function handler(req, res) {
     
     console.log('Fetched quote:', { quote, correctAuthor, wrongAuthor });
 
-    const response = {
-      version: 'vNext',
-      image: `${baseUrl}/api/og?quote=${encodeURIComponent(quote)}`,
-      buttons: [
-        { label: correctAuthor },
-        { label: wrongAuthor }
-      ],
-      post_url: `${baseUrl}/api/answer`,
-    };
+    const html = `
+      <html>
+        <head>
+          <meta property="fc:frame" content="vNext" />
+          <meta property="fc:frame:image" content="${baseUrl}/api/og?quote=${encodeURIComponent(quote)}" />
+          <meta property="fc:frame:button:1" content="${correctAuthor}" />
+          <meta property="fc:frame:button:2" content="${wrongAuthor}" />
+          <meta property="fc:frame:post_url" content="${baseUrl}/api/answer" />
+        </head>
+      </html>
+    `;
 
-    console.log('Sending response:', response);
+    console.log('Sending HTML response:', html);
 
-    res.status(200).json(response);
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(html);
   } catch (error) {
     console.error('Error in quote handler:', error);
     
-    const errorResponse = {
-      version: 'vNext',
-      image: `${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}`,
-      buttons: [
-        { label: 'Try Again' }
-      ],
-      post_url: `${baseUrl}/api/quote`,
-    };
+    const errorHtml = `
+      <html>
+        <head>
+          <meta property="fc:frame" content="vNext" />
+          <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent('An error occurred. Please try again.')}" />
+          <meta property="fc:frame:button:1" content="Try Again" />
+          <meta property="fc:frame:post_url" content="${baseUrl}/api/quote" />
+        </head>
+      </html>
+    `;
 
-    res.status(200).json(errorResponse);
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(errorHtml);
   }
 }

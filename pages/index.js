@@ -15,12 +15,11 @@ export default function Home() {
         <meta property="og:image" content={`${baseUrl}/guessQuote.png`} />
         <meta property="fc:frame" content="vNext" />
         <meta property="fc:frame:image" content={`${baseUrl}/guessQuote.png`} />
-        <meta property="fc:frame:button:1" content="Play" />
+        <meta property="fc:frame:button:1" content="Play Game" />
         <meta property="fc:frame:button:2" content="Share" />
         <meta property="fc:frame:button:2:action" content="link" />
         <meta property="fc:frame:button:2:target" content={shareLink} />
         <meta property="fc:frame:post_url" content={`${baseUrl}/api/quote`} />
-        <meta property="fc:frame:state" content={encodeURIComponent(JSON.stringify({ stage: 'initial' }))} />
       </Head>
       <h1>Guess the Quote</h1>
       <img
