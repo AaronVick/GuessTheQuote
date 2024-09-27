@@ -59,7 +59,7 @@ export default async function handler(req, res) {
         </html>
       `;
     } else if (state.stage === 'next') {
-      // This handles the transition to the next quote after the result
+      // Transitioning to the next question after "Next Quote"
       const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
       console.log('Fetched next quote:', quote);
 
