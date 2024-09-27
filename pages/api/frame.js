@@ -26,57 +26,38 @@ export default async function handler(req, res) {
             <meta property="fc:frame:button:1" content="${correctAuthor}" />
             <meta property="fc:frame:button:2" content="${wrongAuthor}" />
             <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: 0, stage: 'question' }))}" />
+            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: 0, correctCount: 0, stage: 'question' }))}" />
           </head>
         </html>
       `;
     } else if (state.stage === 'question') {
-      if (!buttonIndex) {
-        // This shouldn't happen, but just in case, fetch a new quote
-        const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
-        console.log('Fetched quote:', quote);
+      const totalAnswered = (state.totalAnswered || 0) + 1;
+      const isCorrect = buttonIndex === 1;
+      const correctCount = (state.correctCount || 0) + (isCorrect ? 1 : 0);
+      const selectedAuthor = isCorrect ? state.correctAuthor : state.wrongAuthor;
+      const message = isCorrect
+        ? `Correct! The author was ${selectedAuthor}. You've guessed ${correctCount} quotes correctly out of ${totalAnswered}.`
+        : `Wrong. The correct author was ${state.correctAuthor}. You've guessed ${correctCount} quotes correctly out of ${totalAnswered}.`;
 
-        html = `
-          <html>
-            <head>
-              <meta property="fc:frame" content="vNext" />
-              <meta property="fc:frame:image" content="${baseUrl}/api/og?quote=${encodeURIComponent(quote)}" />
-              <meta property="fc:frame:button:1" content="${correctAuthor}" />
-              <meta property="fc:frame:button:2" content="${wrongAuthor}" />
-              <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-              <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: state.totalAnswered || 0, stage: 'question' }))}" />
-            </head>
-          </html>
-        `;
-      } else {
-        // User has answered
-        const totalAnswered = (state.totalAnswered || 0) + (buttonIndex === 1 ? 1 : 0);
-        const selectedAuthor = buttonIndex === 1 ? state.correctAuthor : state.wrongAuthor;
-        const isCorrect = selectedAuthor === state.correctAuthor;
-        const message = isCorrect 
-          ? `Correct! The author was ${selectedAuthor}.\n\n You've guessed ${totalAnswered} quotes correctly.` 
-          : `Wrong. The correct author was ${state.correctAuthor}.\n\n You've guessed ${totalAnswered} quotes correctly.`;
-        
-        console.log('Response message:', message);
+      console.log('Response message:', message);
 
-        const shareText = encodeURIComponent(`I've guessed ${totalAnswered} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`);
-        const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
+      const shareText = encodeURIComponent(`I've guessed ${correctCount} quotes correctly in the Quote Game!\n\nFrame by @aaronv.eth`);
+      const shareLink = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
 
-        html = `
-          <html>
-            <head>
-              <meta property="fc:frame" content="vNext" />
-              <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(message)}" />
-              <meta property="fc:frame:button:1" content="Next Quote" />
-              <meta property="fc:frame:button:2" content="Share" />
-              <meta property="fc:frame:button:2:action" content="link" />
-              <meta property="fc:frame:button:2:target" content="${shareLink}" />
-              <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-              <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, stage: 'result' }))}" />
-            </head>
-          </html>
-        `;
-      }
+      html = `
+        <html>
+          <head>
+            <meta property="fc:frame" content="vNext" />
+            <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(message)}" />
+            <meta property="fc:frame:button:1" content="Guess Another" />
+            <meta property="fc:frame:button:2" content="Share Score" />
+            <meta property="fc:frame:button:2:action" content="link" />
+            <meta property="fc:frame:button:2:target" content="${shareLink}" />
+            <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
+            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, correctCount, stage: 'result' }))}" />
+          </head>
+        </html>
+      `;
     } else if (state.stage === 'result') {
       // This is for the "Next Quote" button after showing the result
       const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
@@ -90,7 +71,7 @@ export default async function handler(req, res) {
             <meta property="fc:frame:button:1" content="${correctAuthor}" />
             <meta property="fc:frame:button:2" content="${wrongAuthor}" />
             <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: state.totalAnswered || 0, stage: 'question' }))}" />
+            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: state.totalAnswered || 0, correctCount: state.correctCount || 0, stage: 'question' }))}" />
           </head>
         </html>
       `;
