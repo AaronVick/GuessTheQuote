@@ -9,14 +9,15 @@ export default async function handler(req, res) {
   const { untrustedData } = req.body;
   const buttonIndex = untrustedData?.buttonIndex;
   const correctAuthor = untrustedData?.state?.correctAuthor;
-  const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + (buttonIndex === 1 ? 1 : 0);
+  const totalAnswered = (untrustedData?.state?.totalAnswered || 0) + 1;
+  const correctCount = (untrustedData?.state?.correctCount || 0) + (buttonIndex === 1 ? 1 : 0);
 
-  console.log('Received data:', { buttonIndex, correctAuthor, totalAnswered, untrustedData });
+  console.log('Received data:', { buttonIndex, correctAuthor, totalAnswered, correctCount });
 
   try {
     if (buttonIndex === 2) {
       // Handle share action
-      const shareText = encodeURIComponent(`I've guessed ${totalAnswered} quotes correctly in the Quote Game! Can you beat my score?\n\nPlay now:`);
+      const shareText = encodeURIComponent(`I've guessed ${correctCount} quotes correctly out of ${totalAnswered} questions! Can you beat my score?\n\nPlay now:`);
       const shareUrl = `https://warpcast.com/~/compose?text=${shareText}&embeds[]=${encodeURIComponent(baseUrl)}`;
       
       const html = `
@@ -24,7 +25,7 @@ export default async function handler(req, res) {
 <html>
   <head>
     <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(`Share your score: ${totalAnswered} correct guesses!`)}" />
+    <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(`Share your score: ${correctCount} correct out of ${totalAnswered} questions!`)}" />
     <meta property="fc:frame:button:1" content="Back to Game" />
     <meta property="fc:frame:button:2" content="Share Score" />
     <meta property="fc:frame:button:2:action" content="link" />
@@ -42,8 +43,8 @@ export default async function handler(req, res) {
 
     const isCorrect = buttonIndex === 1;
     const message = isCorrect 
-      ? `Correct! You've guessed ${totalAnswered} quotes correctly.` 
-      : `Wrong. The correct author was ${correctAuthor}. You've guessed ${totalAnswered} quotes correctly.`;
+      ? `Correct! You've guessed ${correctCount} quotes correctly out of ${totalAnswered}.` 
+      : `Wrong. The correct author was ${correctAuthor}. You've guessed ${correctCount} quotes correctly out of ${totalAnswered}.`;
 
     // Fetch a new quote for the next round
     const { quote, correctAuthor: newCorrectAuthor, wrongAuthor: newWrongAuthor } = await fetchQuote();
@@ -59,7 +60,7 @@ export default async function handler(req, res) {
     <meta property="fc:frame:button:1" content="Next Quote" />
     <meta property="fc:frame:button:2" content="Share Score" />
     <meta property="fc:frame:post_url" content="${baseUrl}/api/answer" />
-    <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, correctAuthor: newCorrectAuthor, wrongAuthor: newWrongAuthor }))}" />
+    <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, correctCount, correctAuthor: newCorrectAuthor, wrongAuthor: newWrongAuthor }))}" />
   </head>
   <body></body>
 </html>`;
