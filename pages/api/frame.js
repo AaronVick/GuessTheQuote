@@ -49,17 +49,17 @@ export default async function handler(req, res) {
           <head>
             <meta property="fc:frame" content="vNext" />
             <meta property="fc:frame:image" content="${baseUrl}/api/og?message=${encodeURIComponent(message)}" />
-            <meta property="fc:frame:button:1" content="Guess Another" />
+            <meta property="fc:frame:button:1" content="Next Quote" />
             <meta property="fc:frame:button:2" content="Share Score" />
             <meta property="fc:frame:button:2:action" content="link" />
             <meta property="fc:frame:button:2:target" content="${shareLink}" />
             <meta property="fc:frame:post_url" content="${baseUrl}/api/frame" />
-            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, correctCount, stage: 'result' }))}" />
+            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, correctCount, stage: 'next' }))}" />
           </head>
         </html>
       `;
-    } else if (state.stage === 'result') {
-      // This is for the "Next Quote" button after showing the result
+    } else if (state.stage === 'next') {
+      // This handles the transition to the next quote after the result
       const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
       console.log('Fetched next quote:', quote);
 
