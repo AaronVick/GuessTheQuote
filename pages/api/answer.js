@@ -41,17 +41,35 @@ export default async function handler(req, res) {
       return;
     }
 
-    const isCorrect = buttonIndex === 1;
-    const message = isCorrect 
-      ? `Correct! You've guessed ${correctCount} quotes correctly out of ${totalAnswered}.` 
-      : `Wrong. The correct author was ${correctAuthor}. You've guessed ${correctCount} quotes correctly out of ${totalAnswered}.`;
-
     // Fetch a new quote for the next round
     const { quote, correctAuthor: newCorrectAuthor, wrongAuthor: newWrongAuthor } = await fetchQuote();
     
     console.log('Fetched new quote:', { quote, newCorrectAuthor, newWrongAuthor });
 
-    const html = `
+    let html;
+    if (buttonIndex === 1) {
+      // This is the "Next Quote" button, so we should show the new quote
+      html = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${baseUrl}/api/og?quote=${encodeURIComponent(quote)}" />
+    <meta property="fc:frame:button:1" content="${newCorrectAuthor}" />
+    <meta property="fc:frame:button:2" content="${newWrongAuthor}" />
+    <meta property="fc:frame:post_url" content="${baseUrl}/api/answer" />
+    <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ totalAnswered, correctCount, correctAuthor: newCorrectAuthor, wrongAuthor: newWrongAuthor }))}" />
+  </head>
+  <body></body>
+</html>`;
+    } else {
+      // This is the initial answer, so we should show the result and offer "Next Quote"
+      const isCorrect = buttonIndex === 1;
+      const message = isCorrect 
+        ? `Correct! You've guessed ${correctCount} quotes correctly out of ${totalAnswered}.` 
+        : `Wrong. The correct author was ${correctAuthor}. You've guessed ${correctCount} quotes correctly out of ${totalAnswered}.`;
+
+      html = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -64,6 +82,7 @@ export default async function handler(req, res) {
   </head>
   <body></body>
 </html>`;
+    }
 
     console.log('Sending game HTML response:', html);
     res.setHeader('Content-Type', 'text/html');
