@@ -6,6 +6,9 @@ export default async function handler(req, res) {
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://guess-the-quote-mauve.vercel.app';
+  const { untrustedData } = req.body;
+  const state = JSON.parse(decodeURIComponent(untrustedData?.state || '{}'));
+  const { totalAnswered = 0, correctCount = 0 } = state;
 
   try {
     const { quote, correctAuthor, wrongAuthor } = await fetchQuote();
@@ -21,6 +24,7 @@ export default async function handler(req, res) {
     <meta property="fc:frame:button:1" content="${correctAuthor}" />
     <meta property="fc:frame:button:2" content="${wrongAuthor}" />
     <meta property="fc:frame:post_url" content="${baseUrl}/api/answer" />
+    <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered, correctCount }))}" />
   </head>
   <body></body>
 </html>`;
