@@ -17,9 +17,13 @@ export default async function handler(req, res) {
     const newTotalAnswered = totalAnswered + 1;
     const isCorrect = buttonIndex === 1;
     const newCorrectCount = correctCount + (isCorrect ? 1 : 0);
+    
+    // Ensure we have a valid author name, even if state is incomplete
+    const displayedAuthor = correctAuthor || 'the correct author';
+    
     const message = isCorrect 
-      ? `Correct! The author was ${correctAuthor}. You've guessed ${newCorrectCount} quotes correctly out of ${newTotalAnswered}.` 
-      : `Wrong. The correct author was ${correctAuthor}. You've guessed ${newCorrectCount} quotes correctly out of ${newTotalAnswered}.`;
+      ? `Correct! The author was ${displayedAuthor}. You've guessed ${newCorrectCount} quotes correctly out of ${newTotalAnswered}.` 
+      : `Wrong. The correct author was ${displayedAuthor}. You've guessed ${newCorrectCount} quotes correctly out of ${newTotalAnswered}.`;
 
     const html = `
 <!DOCTYPE html>

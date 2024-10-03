@@ -21,6 +21,7 @@ export default async function handler(req, res) {
     <meta property="fc:frame:button:1" content="${correctAuthor}" />
     <meta property="fc:frame:button:2" content="${wrongAuthor}" />
     <meta property="fc:frame:post_url" content="${baseUrl}/api/answer" />
+    <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ correctAuthor, wrongAuthor, totalAnswered: 0, correctCount: 0 }))}" />
   </head>
   <body></body>
 </html>`;
