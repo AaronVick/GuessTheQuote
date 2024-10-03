@@ -14,7 +14,6 @@ export default async function handler(req, res) {
   console.log('Received data:', { buttonIndex, state });
 
   try {
-    let html;
     const newTotalAnswered = totalAnswered + 1;
     const isCorrect = buttonIndex === 1;
     const newCorrectCount = correctCount + (isCorrect ? 1 : 0);
@@ -22,7 +21,7 @@ export default async function handler(req, res) {
       ? `Correct! The author was ${correctAuthor}. You've guessed ${newCorrectCount} quotes correctly out of ${newTotalAnswered}.` 
       : `Wrong. The correct author was ${correctAuthor}. You've guessed ${newCorrectCount} quotes correctly out of ${newTotalAnswered}.`;
 
-    html = `
+    const html = `
 <!DOCTYPE html>
 <html>
   <head>
